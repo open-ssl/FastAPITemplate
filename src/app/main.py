@@ -6,12 +6,20 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from typing import List, Optional
 
+from fastapi_users import fastapi_users
 from pydantic import BaseModel, Field, ValidationError
 
+from auth.base import auth_backend
+
 app = FastAPI(title="Template App")
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"],
+)
 
 
-# ONLY FOR Debug mode. Show server error to user
+# FOR Debug mode ONLY. It shows server's error to user
 @app.exception_handler(ValidationError)
 async def validation_exception_handler(_: Request, exc: ValidationError):
     return JSONResponse(
