@@ -21,7 +21,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     email = Column(String, nullable=False)
     username = Column(String, nullable=False)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
-    role_id = Column(Integer, ForeignKey(role.id))
+    role_id = Column(Integer, ForeignKey(role.c.id))
     hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
