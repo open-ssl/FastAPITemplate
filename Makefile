@@ -1,8 +1,8 @@
 start:
-	uvicorn src.app.main:app --reload
+	uvicorn src.main:app --reload
 
 black:
-	black auth config migrations src/app
+	black migrations src
 
 migrate:
 	sh ./scripts/migrate_db.sh "$(text)"
