@@ -37,6 +37,6 @@ user = Table(
     Column("is_verified", Boolean, default=False, nullable=False),
 )
 
-# Create models via sqlalchemy engine
+# Create models by sqlalchemy engine
 # engine = sqlalchemy.create_engine(DATABASE_URL)
 # meta_data.create_all(engine)
