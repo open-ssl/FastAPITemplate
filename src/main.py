@@ -2,10 +2,14 @@ from urllib.request import Request
 
 from fastapi import FastAPI, Depends
 from fastapi.encoders import jsonable_encoder
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
 from pydantic import ValidationError
 from starlette import status
 from starlette.responses import JSONResponse
 
+from redis import asyncio as aioredis
 from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.schemas import UserRead, UserCreate
 from src.operations.router import router as router_operation
@@ -30,6 +34,15 @@ app.include_router(
 )
 
 
+@app.on_event("startup")
+async def startup():
+    print("!!!!")
+    redis = aioredis.from_url(
+        "redis://localhost:6379", encoding="utf8", decode_responses=True
+    )
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+
 @app.get("/protected-route")
 def protected_route(user: User = Depends(current_user)):
     return f"Hello, {user.email}"
@@ -47,6 +60,7 @@ async def validation_exception_handler(_: Request, exc: ValidationError):
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=jsonable_encoder({"detail": exc.errors()}),
     )
+
 
 #
 # some_users_data_in_memory = list(
