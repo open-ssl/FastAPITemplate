@@ -3,4 +3,5 @@ from pydantic import BaseModel
 
 class BaseResponse(BaseModel):
     status: int
-    type: str
+    data: str
+    details: str

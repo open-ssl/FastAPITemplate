@@ -1,4 +1,10 @@
+from urllib.request import Request
+
 from fastapi import FastAPI, Depends
+from fastapi.encoders import jsonable_encoder
+from pydantic import ValidationError
+from starlette import status
+from starlette.responses import JSONResponse
 
 from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.schemas import UserRead, UserCreate
@@ -34,14 +40,14 @@ def unprotected_route():
     return "Hello, Annonymus"
 
 
-# # FOR Debug mode ONLY. It shows server's error to user
-# @app.exception_handler(ValidationError)
-# async def validation_exception_handler(_: Request, exc: ValidationError):
-#     return JSONResponse(
-#         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-#         content=jsonable_encoder({"detail": exc.errors()}),
-#     )
-#
+# FOR Debug mode ONLY. It shows server's error to user
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(_: Request, exc: ValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content=jsonable_encoder({"detail": exc.errors()}),
+    )
+
 #
 # some_users_data_in_memory = list(
 #     [
