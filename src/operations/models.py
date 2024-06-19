@@ -4,10 +4,9 @@ from sqlalchemy import (
     TIMESTAMP,
     Table,
     Column,
-    MetaData,
 )
 
-metadata = MetaData()
+from src.database import metadata
 
 operation = Table(
     "operation",

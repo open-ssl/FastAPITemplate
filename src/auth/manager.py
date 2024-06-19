@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin, exceptions, schemas, models
 
-from src.database import User
+from src.auth.models import User
 from src.auth.utils import get_user_db
 
 SALT_PART = "VERY_SECRET_AND_ENCRYPTED_LINE"

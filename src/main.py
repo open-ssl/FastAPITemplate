@@ -11,10 +11,10 @@ from starlette.responses import JSONResponse
 
 from redis import asyncio as aioredis
 from src.auth.base_config import auth_backend, fastapi_users, current_user
+from src.auth.models import User
 from src.auth.schemas import UserRead, UserCreate
 from src.operations.router import router as operation_router
 from src.tasks.router import router as tasks_router
-from src.database import User
 
 app = FastAPI(title="Template App")
 

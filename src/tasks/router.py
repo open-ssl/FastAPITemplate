@@ -2,7 +2,10 @@ from fastapi import APIRouter, BackgroundTasks, Depends
 
 from src.auth.base_config import current_user
 from src.base_schemas import BaseResponse
-from src.tasks.tasks import send_email_report_dashboard, send_email_report_dashboard_with_celery
+from src.tasks.tasks import (
+    send_email_report_dashboard,
+    send_email_report_dashboard_with_celery,
+)
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 

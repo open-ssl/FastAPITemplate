@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from sqlalchemy import (
-    MetaData,
     Integer,
     String,
     TIMESTAMP,
@@ -11,9 +10,11 @@ from sqlalchemy import (
     JSON,
     Boolean,
 )
+from fastapi_users.db import SQLAlchemyBaseUserTable
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
+from sqlalchemy.orm import Mapped, mapped_column
 
-metadata = MetaData()
-
+from src.database import metadata
 
 role = Table(
     "role",
@@ -36,6 +37,22 @@ user = Table(
     Column("is_superuser", Boolean, default=False, nullable=False),
     Column("is_verified", Boolean, default=False, nullable=False),
 )
+
+
+Base: DeclarativeMeta = declarative_base()
+
+
+class User(SQLAlchemyBaseUserTable[int], Base):
+    id = Column(Integer, primary_key=True)
+    email = Column(String, nullable=False)
+    username = Column(String, nullable=False)
+    registered_at = Column(TIMESTAMP, default=datetime.utcnow)
+    role_id = Column(Integer, ForeignKey(role.c.id))
+    hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
 
 # Create models by sqlalchemy engine
 # engine = sqlalchemy.create_engine(DATABASE_URL)
