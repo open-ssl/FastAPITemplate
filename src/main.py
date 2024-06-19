@@ -12,7 +12,8 @@ from starlette.responses import JSONResponse
 from redis import asyncio as aioredis
 from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.schemas import UserRead, UserCreate
-from src.operations.router import router as router_operation
+from src.operations.router import router as operation_router
+from src.tasks.router import router as tasks_router
 from src.database import User
 
 app = FastAPI(title="Template App")
@@ -29,14 +30,12 @@ app.include_router(
     tags=["Auth"],
 )
 
-app.include_router(
-    router_operation,
-)
+app.include_router(operation_router)
+app.include_router(tasks_router)
 
 
 @app.on_event("startup")
 async def startup():
-    print("!!!!")
     redis = aioredis.from_url(
         "redis://localhost:6379", encoding="utf8", decode_responses=True
     )

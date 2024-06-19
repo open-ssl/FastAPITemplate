@@ -6,6 +6,12 @@ start:
 black:
 	black migrations src
 
+celery:
+	celery -A src.tasks.tasks:celery worker --loglevel=INFO
+
+celery-web:
+	celery -A src.tasks.tasks:celery flower
+
 redis:
 	redis-cli --pass ${REDIS_PASS}
 

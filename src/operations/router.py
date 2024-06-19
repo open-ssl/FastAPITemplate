@@ -10,7 +10,7 @@ from src.database import get_async_session
 from src.operations.models import operation
 from src.operations.schemas import OperationRead, OperationCreate
 
-router = APIRouter(prefix="/operations", tags=["Operation"])
+router = APIRouter(prefix="/operations", tags=["Operations"])
 
 
 @router.get("/long_operation")
