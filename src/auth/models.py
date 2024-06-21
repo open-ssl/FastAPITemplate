@@ -11,8 +11,8 @@ from sqlalchemy import (
     Boolean,
 )
 from fastapi_users.db import SQLAlchemyBaseUserTable
-from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.orm import Mapped, mapped_column, declarative_base
 
 from src.database import metadata
 

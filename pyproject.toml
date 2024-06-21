@@ -18,7 +18,18 @@ redis = "^5.0.6"
 celery = "^5.4.0"
 flower = "^2.0.1"
 fastapi-cache2 = "^0.2.1"
+pytest = "^8.2.2"
+pytest-asyncio = "^0.23.7"
 
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    'ignore:function ham\(\) is deprecated:DeprecationWarning',
+]
+asyncio_mode="auto"
 
 [build-system]
 requires = ["poetry-core"]

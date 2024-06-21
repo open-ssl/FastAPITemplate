@@ -17,22 +17,6 @@ services:
     networks:
       - postgres_network
 
-  postgres-test:
-    container_name: "postgres_db_test"
-    image: postgres:16-alpine
-    restart: always
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME_TEST}
-      PGDATA: /data/postgres_test
-    ports:
-      - "${DB_PORT}:5432"
-    volumes:
-      - postgres_test_volume:/var/lib/postgresql/data
-    networks:
-      - postgres_test_network
-
   redis:
     container_name: "redis"
     image: redis:latest
@@ -49,13 +33,10 @@ services:
 networks:
   postgres_network:
     driver: bridge
-  postgres_test_network:
-    driver: bridge
   redis_network:
     driver: bridge
 
 volumes:
     postgres_volume:
-    postgres_test_volume:
     redis_volume:
       driver: local

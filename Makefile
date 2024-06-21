@@ -1,10 +1,12 @@
 include .env
 
+check: black test
+
 start:
 	uvicorn src.main:app --reload
 
 black:
-	black migrations src
+	black migrations src tests
 
 celery:
 	celery -A src.tasks.tasks:celery worker --loglevel=INFO
@@ -21,3 +23,6 @@ migrate:
 upgrade:
 	#sh ./scripts/upgrade_db.sh "$(hash)"
 	alembic upgrade head
+
+test:
+	pytest -v -s tests

@@ -4,7 +4,6 @@ from fastapi import FastAPI, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-
 from pydantic import ValidationError
 from starlette import status
 from starlette.responses import JSONResponse
@@ -13,10 +12,20 @@ from redis import asyncio as aioredis
 from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.models import User
 from src.auth.schemas import UserRead, UserCreate
+from src.config import REDIS_PORT
 from src.operations.router import router as operation_router
 from src.tasks.router import router as tasks_router
 
 app = FastAPI(title="Template App")
+
+
+@app.on_event("startup")
+async def startup_event():
+    redis = aioredis.from_url(
+        f"redis://localhost:{REDIS_PORT}", encoding="utf8", decode_responses=True
+    )
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
@@ -32,14 +41,6 @@ app.include_router(
 
 app.include_router(operation_router)
 app.include_router(tasks_router)
-
-
-@app.on_event("startup")
-async def startup():
-    redis = aioredis.from_url(
-        "redis://localhost:6379", encoding="utf8", decode_responses=True
-    )
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
 
 @app.get("/protected-route")
