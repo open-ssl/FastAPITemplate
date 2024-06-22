@@ -6,7 +6,11 @@ from sqlalchemy import pool
 from alembic import context
 
 from src.config import DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT
-from src import metadata
+from src import BaseMetadata, DeclarativeBase
+
+from src.auth.models import *
+from src.operations.models import *
+from src.ws_chat.models import *
 
 
 # import os, sys
@@ -34,7 +38,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = [metadata]
+target_metadata = [BaseMetadata, DeclarativeBase.metadata]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

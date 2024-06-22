@@ -6,11 +6,11 @@ from sqlalchemy import (
     Column,
 )
 
-from src import metadata
+from src import BaseMetadata
 
 operation = Table(
     "operation",
-    metadata,
+    BaseMetadata,
     Column("id", Integer, primary_key=True),
     Column("quantity", String),
     Column("figi", String),

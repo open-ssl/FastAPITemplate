@@ -18,10 +18,9 @@ from src.config import REDIS_PORT
 from src.operations.router import router as operation_router
 from src.tasks.router import router as tasks_router
 from src.pages.router import router as pages_router
+from src.ws_chat.router import router as chat_router
 
 app = FastAPI(title="Template App")
-
-app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
@@ -38,6 +37,7 @@ app.include_router(
 app.include_router(operation_router)
 app.include_router(tasks_router)
 app.include_router(pages_router)
+app.include_router(chat_router)
 
 
 @app.get("/protected-route")
@@ -200,3 +200,7 @@ async def validation_exception_handler(_: Request, exc: ValidationError):
 # def add_trades(trades: List[Trade]):
 #     some_trades_data_in_memory.append(trades)
 #     return {"status": 200, "data": some_trades_data_in_memory}
+
+
+if __name__ == "__main__":
+    app.mount("/static", StaticFiles(directory="./src/static"), name="static")

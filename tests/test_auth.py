@@ -3,26 +3,32 @@ import http
 import pytest
 from sqlalchemy import insert, select
 
-from src.auth.models import role
+from src.auth.models import Role
 from conftest import client
 from tests.conftest import async_session_maker
 
 
 async def test_create_new_role():
     async with async_session_maker() as session:
-        stmt = insert(role).values(id=1, name="admin", permissions=None)
+        stmt = insert(Role).values(id=1, name="admin", permissions=None)
         await session.execute(stmt)
         await session.commit()
 
-        query = select(role)
-        filtered_query = select(role).where(role.c.id == 1)
+        query = select(Role)
+        filtered_query = select(Role).where(Role.id == 1)
         query_result = await session.execute(query)
         filtered_query_result = await session.execute(filtered_query)
 
         exp_result = [(1, "admin", None)]
-        assert query_result.all() == exp_result, "No any roles in database"
+
+        query_values = [item[0].as_tuple() for item in query_result.all()]
+        filtered_query_values = [
+            item[0].as_tuple() for item in filtered_query_result.all()
+        ]
+
+        assert query_values == exp_result, "No any roles in database"
         assert (
-            filtered_query_result.all() == exp_result
+            filtered_query_values == exp_result
         ), "No role with identifier 1 in database"
 
 

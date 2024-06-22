@@ -24,3 +24,8 @@ def get_search_template(request: Request, operations=Depends(get_specific_operat
         "search.html",
         {"request": request, "operations": operations.get("data", dict())},
     )
+
+
+@router.get("/chat")
+def get_chat_page(request: Request):
+    return templates.TemplateResponse("chat.html", {"request": request})

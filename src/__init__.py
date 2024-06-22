@@ -1,1 +1,1 @@
-from src.database import metadata
+from src.database import BaseMetadata, DeclarativeBase
