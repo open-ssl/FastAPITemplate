@@ -1,7 +1,6 @@
 import time
-from urllib.request import Request
 
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -15,6 +14,9 @@ from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.models import User
 from src.auth.schemas import UserRead, UserCreate
 from src.config import REDIS_PORT
+from src.database import get_async_session
+from src.utils import auth_guard, Paginator
+
 from src.operations.router import router as operation_router
 from src.tasks.router import router as tasks_router
 from src.pages.router import router as pages_router
@@ -32,6 +34,7 @@ app.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
     tags=["Auth"],
+    dependencies=[],
 )
 
 app.include_router(operation_router)
@@ -48,6 +51,21 @@ def protected_route(user: User = Depends(current_user)):
 @app.get("/unprotected-route")
 def unprotected_route():
     return "Hello, Annonymus"
+
+
+@app.get("/session")
+async def get_session(_=Depends(get_async_session)):
+    return
+
+
+@app.get("/pagination_params")
+async def get_params(params: Paginator = Depends(Paginator)):
+    return params
+
+
+@app.get("/guard_params", dependencies=[Depends(auth_guard)])
+async def get_guard_params():
+    return auth_guard.params
 
 
 @app.on_event("startup")
@@ -92,7 +110,6 @@ async def process_request(request: Request, call_next):
 
 
 # FOR Debug mode ONLY. It shows server's error to user
-@app.exception_handler(ValidationError)
 async def validation_exception_handler(_: Request, exc: ValidationError):
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -204,3 +221,6 @@ async def validation_exception_handler(_: Request, exc: ValidationError):
 
 if __name__ == "__main__":
     app.mount("/static", StaticFiles(directory="./src/static"), name="static")
+    app.add_exception_handler(
+        exc_class_or_status_code=ValidationError, handler=validation_exception_handler
+    )
