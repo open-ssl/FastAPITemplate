@@ -6,7 +6,7 @@ from sqlalchemy import (
     Column,
 )
 
-from src.database import metadata
+from src import metadata
 
 operation = Table(
     "operation",

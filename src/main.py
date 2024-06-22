@@ -1,31 +1,27 @@
+import time
 from urllib.request import Request
 
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status
 from fastapi.encoders import jsonable_encoder
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
-from starlette import status
-from starlette.responses import JSONResponse
-
 from redis import asyncio as aioredis
+
 from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.models import User
 from src.auth.schemas import UserRead, UserCreate
 from src.config import REDIS_PORT
 from src.operations.router import router as operation_router
 from src.tasks.router import router as tasks_router
+from src.pages.router import router as pages_router
 
 app = FastAPI(title="Template App")
 
-
-@app.on_event("startup")
-async def startup_event():
-    redis = aioredis.from_url(
-        f"redis://localhost:{REDIS_PORT}", encoding="utf8", decode_responses=True
-    )
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-
+app.mount("/static", StaticFiles(directory="src/static"), name="static")
 
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
@@ -41,6 +37,7 @@ app.include_router(
 
 app.include_router(operation_router)
 app.include_router(tasks_router)
+app.include_router(pages_router)
 
 
 @app.get("/protected-route")
@@ -51,6 +48,47 @@ def protected_route(user: User = Depends(current_user)):
 @app.get("/unprotected-route")
 def unprotected_route():
     return "Hello, Annonymus"
+
+
+@app.on_event("startup")
+async def startup_event():
+    redis = aioredis.from_url(
+        f"redis://localhost:{REDIS_PORT}", encoding="utf8", decode_responses=True
+    )
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+
+origins = [
+    "http://localhost",
+    "http://localhost:8000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"],
+    allow_headers=[
+        "Content-Type",
+        "Set-Cookie",
+        "Access-Control-Allow-Headers",
+        "Access-Control-Allow-Origin",
+        "Authorization",
+    ],
+)
+
+# Use right redirect to HTTPS or WS
+# from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+# app.add_middleware(HTTPSRedirectMiddleware)
+
+
+@app.middleware("http")
+async def process_request(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = f"{round(process_time, 6)} seconds"
+    return response
 
 
 # FOR Debug mode ONLY. It shows server's error to user

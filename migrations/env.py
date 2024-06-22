@@ -6,11 +6,10 @@ from sqlalchemy import pool
 from alembic import context
 
 from src.config import DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT
-from src.database import metadata
+from src import metadata
 
 
 # import os, sys
-#
 # sys.path.append(os.path.join(sys.path[0], "src"))
 
 
