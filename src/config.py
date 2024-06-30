@@ -17,6 +17,7 @@ DB_PASS_TEST = os.environ.get("DB_PASS_TEST")
 DB_PORT_TEST = os.environ.get("DB_PORT_TEST")
 DB_USER_TEST = os.environ.get("DB_USER_TEST")
 
+REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PORT = os.environ.get("REDIS_PORT")
 REDIS_PASS = os.environ.get("REDIS_PASS")
 SMTP_USER = os.environ.get("SMTP_USER")

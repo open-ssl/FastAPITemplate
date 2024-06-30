@@ -13,7 +13,7 @@ from redis import asyncio as aioredis
 from src.auth.base_config import auth_backend, fastapi_users, current_user
 from src.auth.models import User
 from src.auth.schemas import UserRead, UserCreate
-from src.config import REDIS_PORT
+from src.config import REDIS_HOST, REDIS_PORT
 from src.database import get_async_session
 from src.utils import auth_guard, Paginator
 

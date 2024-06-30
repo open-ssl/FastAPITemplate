@@ -3,7 +3,7 @@ import http
 import pytest
 from sqlalchemy import insert, select
 
-from src.auth.models import Role
+from .auth.models import Role
 from conftest import client
 from tests.conftest import async_session_maker
 

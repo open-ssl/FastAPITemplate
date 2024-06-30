@@ -26,3 +26,6 @@ upgrade:
 
 test:
 	pytest -v -s tests
+
+rebuild:
+	docker compose build && docker compose up

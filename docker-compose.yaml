@@ -1,8 +1,8 @@
-version: '3.8'
+version: '3.7'
 
 services:
   postgres:
-    container_name: "postgres_db"
+    container_name: postgres_db
     image: postgres:16-alpine
     restart: always
     environment:
@@ -12,31 +12,51 @@ services:
       PGDATA: /data/postgres
     ports:
       - "${DB_PORT}:5432"
-    volumes:
-      - postgres_volume:/var/lib/postgresql/data
-    networks:
-      - postgres_network
 
   redis:
-    container_name: "redis"
-    image: redis:latest
+    container_name: redis
+    image: redis:7
     restart: always
     environment:
-      - REDIS_PASSWORD=${REDIS_PASS}
       - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    command: --port ${REDIS_PORT}
     ports:
-      - "${REDIS_PORT}:6379"
-    volumes:
-      - redis_volume:/root/redis
-      - redis_volume:/usr/local/etc/redis/redis.conf
+      - ${REDIS_PORT}:${REDIS_PORT}
+    expose:
+      - ${REDIS_PORT}
 
-networks:
-  postgres_network:
-    driver: bridge
-  redis_network:
-    driver: bridge
+  fastapi-template-app:
+    container_name: fastapi_app
+    env_file:
+      - .env
+    build:
+      context: .
+    command: ["/api/deployment/docker-entrypoint.sh"]
+    ports:
+      - 9999:8000
+    depends_on:
+      - postgres
+      - redis
 
-volumes:
-    postgres_volume:
-    redis_volume:
-      driver: local
+  celery:
+    container_name: celery_app
+    env_file:
+      - .env
+    build:
+      context: .
+    command: ["/api/deployment/celery-entrypoint.sh", "celery"]
+    depends_on:
+      - redis
+
+  flower:
+    container_name: flower_app
+    env_file:
+      - .env
+    build:
+      context: .
+    command: ["/api/deployment/celery-entrypoint.sh", "flower"]
+    depends_on:
+      - redis
+      - celery
+    ports:
+      - 8888:5555
